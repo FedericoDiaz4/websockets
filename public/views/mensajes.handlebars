@@ -1,0 +1,11 @@
+{{#if conMensajes}}
+    {{#each mensajes}}
+        <div class="">
+            <span style="color: blue; font-weight:bold">{{this.author}}</span>
+            <span style="color: brown;">{{this.fyh}}: </span>
+            <span style="color: gray; font-style:italic">{{this.msj}}</span>
+        </div>
+    {{/each}}
+{{else}}
+    <h3 class="text-center">No hay mensajes.</h3>
+{{/if}}
