@@ -1,1 +1,0 @@
-[{"title":"prod1","price":"100","thumbnail":"https://cdn0.iconfinder.com/data/icons/sports-113/24/drink-sports-bottle-water-athletics-sport-128.png","id":1},{"title":"prod2","price":"200","thumbnail":"https://cdn1.iconfinder.com/data/icons/seo-outline-colored-free/128/Smartphone_iphone_phone-128.png","id":2}]

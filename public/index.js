@@ -45,8 +45,8 @@ agregarProducto.addEventListener('submit', e => {
 agregarMensaje.addEventListener('submit', e => {
     e.preventDefault();
     const mensaje = {
-        author: agregarMensaje[0].value,
-        msj: agregarMensaje[1].value,
+        email: agregarMensaje[0].value,
+        mensaje: agregarMensaje[1].value,
         fyh: new Date().toLocaleDateString(),
     }
     socket.emit('addMensaje', mensaje)
