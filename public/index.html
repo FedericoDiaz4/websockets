@@ -40,13 +40,41 @@
         <h1 class="text-center">Dejanos tu mensaje.</h1>
         <form id="agregarMensaje" class="row border" style="background-color: lightgray;">
             
-            <div class="mb-3 col-4">
-                <input type="email" class="form-control form-control-sm" id="mail" name="mail" required placeholder="Mail">
+            <div class="row">
+                <div class="mb-3 col-4">
+                    <input type="email" class="form-control form-control-sm" id="id" name="id" required placeholder="Mail">
+                </div>
+    
+                <div class="mb-3 col-4">
+                    <input type="text" class="form-control form-control-sm" id="nombre" name="nombre" required placeholder="Nombre">
+                </div>
+    
+                <div class="mb-3 col-4">
+                    <input type="text" class="form-control form-control-sm" id="apellido" name="apellido" required placeholder="Apellido">
+                </div>
             </div>
 
-            <div class="mb-3 col-8">
-                <input type="text" rows="5" class="form-control form-control-sm" id="mensaje" name="mensaje" required placeholder="Mensaje..."></textarea>
+            <div class="row">
+                <div class="mb-3 col-4">
+                    <input type="number" class="form-control form-control-sm" id="edad" name="edad" required placeholder="Edad">
+                </div>
+
+                <div class="mb-3 col-4">
+                    <input type="text" class="form-control form-control-sm" id="alias" name="alias" required placeholder="Alias">
+                </div>
+
+                <div class="mb-3 col-4">
+                    <input type="text" class="form-control form-control-sm" id="thumbnail" name="thumbnail" required placeholder="Avatar">
+                </div>
+
             </div>
+
+            <div class="row">
+                <div class="mb-3 col-12">
+                    <input type="text" rows="5" class="form-control form-control-sm" id="mensaje" name="mensaje" required placeholder="Mensaje..."></textarea>
+                </div>
+            </div>
+            
 
             <div class="col-1">
                 <button class="btn btn-success align">Enviar</button>

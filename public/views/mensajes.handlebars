@@ -1,9 +1,9 @@
 {{#if conMensajes}}
     {{#each mensajes}}
         <div class="">
-            <span style="color: blue; font-weight:bold">{{this.email}}</span>
-            <span style="color: brown;">{{this.fyh}}: </span>
-            <span style="color: gray; font-style:italic">{{this.mensaje}}</span>
+            <span style="color: blue; font-weight:bold">{{this.author.id}}</span>
+            <span style="color: brown;">{{this.author.nombre}} {{this.author.apellido}}: </span>
+            <span style="color: gray; font-style:italic">{{this.text}}</span>
         </div>
     {{/each}}
 {{else}}

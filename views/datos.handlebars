@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Productos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="../../public/index.js"></script>
+</head>
+<body>
+
+    <h1 class="text-center">Productos Test.</h1>
+
+{{#if conProductos}}
+    <table class="table">
+        <thead class="table-secondary">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Titulo</th>
+                <th scope="col">Precio</th>
+                <th scope="col">Imagen</th>
+            </tr>
+        </thead>
+        
+        <tbody class="table-secondary">
+            {{#each productos}}
+            <tr>
+                <th scope="row">{{this.id}}</th>
+                    <td>{{this.title}}</td>
+                    <td>$ {{this.price}}</td>
+                    <td><img src={{this.thumbnail}} alt="imagen producto" width="35"></td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+{{else}}
+    <h2 class="text-center">No hay productos.</h2>
+{{/if}}
+    
+</body>
+</html>

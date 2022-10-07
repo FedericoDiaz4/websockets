@@ -3,7 +3,7 @@ const mysqlOptions = {
     connection: {
         host: 'localhost',
         user: 'root',
-        password: '',
+        password: 'cmsis00',
         database: 'test'
     }
 }
