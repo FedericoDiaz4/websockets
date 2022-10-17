@@ -3,6 +3,25 @@ const socket = io();
 const agregarProducto = document.getElementById('agregarProducto');
 const agregarMensaje = document.getElementById('agregarMensaje');
 
+const logout = () => {
+    console.log("asd");
+    console.log(window.location.href);
+    window.location.href = 'localhost:8080/logout';
+}
+
+socket.on('newSession', async usuario => {
+    if (usuario !== null) {
+        try {
+            const res = await fetch('./views/usuario.handlebars');
+            const plantilla = await res.text();
+            const template = Handlebars.compile(plantilla);
+            document.getElementById("loginUsuario").innerHTML = template({usuario});
+        } catch (error) {
+            console.log(error);
+        }
+    }
+})
+
 socket.on('getProductos', async productos => {
     if (productos !== null) {
         try {
@@ -57,4 +76,8 @@ agregarMensaje.addEventListener('submit', e => {
     }
     socket.emit('addMensaje', mensaje)
     agregarMensaje.reset();
-})
+});
+
+socket.on('redirect', ruta => {
+    window.location.href = ruta;
+});

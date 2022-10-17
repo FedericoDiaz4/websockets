@@ -1,13 +1,14 @@
 import express from 'express';
 import { Server as HttpServer } from 'http';
 import { Server as IOServer } from 'socket.io';
+import cookieParser from 'cookie-parser';
+import session from 'express-session';
+import connectMongo from 'connect-mongo';
 import { getProductosTest } from './controllers/faker.js';
 import { engine } from 'express-handlebars';
 import { productosCollection, productosSchema } from './models/productos.js';
 import ContenedorMongoDB from './contenedores/contenedorMongo.js';
 import { mensajesCollection, mensajesSchema } from './models/mensajes.js';
-import {normalize, schema, denormalize} from 'normalizr';
-import util from 'util';
 
 const app = express();
 const httpServer = new HttpServer(app);
@@ -18,56 +19,49 @@ const contenedorMongoMensajes = new ContenedorMongoDB(mensajesCollection, mensaj
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(express.static('public'));
+app.use(cookieParser());
+
+const sessionData = session({
+    store: new connectMongo({
+        mongoUrl: 'mongodb+srv://root:q1w2e3r4@cluster0.dxsuj0e.mongodb.net/?retryWrites=true&w=majority',
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    }),
+    secret: 'secret',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        maxAge: 10000 * 60
+    },
+    rolling: true
+});
+
+app.use(sessionData);
 
 app.engine('.handlebars', engine());
 app.set("view engine", ".handlebars");
 app.set("views", "./views");
 
-const print = (obj) => {
-    console.log(util.inspect(obj, false, 12, true));
-}
+app.get('/login', (req, res) => {
+    res.sendFile('./views/login.html', {root: '.'});
+});
 
-const normalizarData = (data) => {
-    const author = new schema.Entity('author');
-    const text = new schema.Entity('text', {
-        author: author
-    });
-    
-    const message = new schema.Entity('message', {
-        author: author,
-        text: [text]
-    });
+app.post('/login', (req, res) => {
+    const { name } = req.body;
+    req.session.user = name;
+    res.redirect('/');
+});
 
-    const normalizedData = normalize(data, message);
-    console.log(JSON.stringify(data).length);
-    console.log(JSON.stringify(normalizedData).length);
-    //print(normalizedData);
-    return normalizedData;
-} 
-
-io.on('connection', async socket => {
-    console.log("Usuario Conectado");
-    const productos = await contenedorMongoProductos.getAll();
-    const mensajes = await contenedorMongoMensajes.getAll();
-    normalizarData(mensajes);
-    socket.emit("getProductos", productos);
-    socket.emit("getMensajes", mensajes);
-
-    socket.on('addProducto', async prod => {
-        console.log("Agregando producto...");
-        await contenedorMongoProductos.addData(prod);
-        console.log("Producto Agregado.");
-        const productos = await contenedorMongoProductos.getAll();
-        io.sockets.emit('getProductos', productos);
-    });
-
-    socket.on('addMensaje', async msj => {
-        console.log("Agregando Mensaje...");
-        await contenedorMongoMensajes.addData(msj);
-        console.log("Mensaje Agregado");
-        const mensajes = await contenedorMongoMensajes.getAll();
-        io.sockets.emit('getMensajes', mensajes);   
+app.get('/logout', async (req,res) => {
+    const user = req.session.user;
+    req.session.destroy(err => {
+        if (err) {
+           return res.json({status: 'Logout Error', body: err});
+        }
     })
+    res.render('logout', {
+        name: user
+    });
 });
 
 app.get('/api/productos-test', async (req,res) => {
@@ -77,6 +71,47 @@ app.get('/api/productos-test', async (req,res) => {
         conProductos: (productos.length > 0)
     });
 })
+
+const wrap = middleware => (socket, next) => middleware(socket.request, {}, next);
+
+io.use(wrap(sessionData));
+
+io.on('connection', async socket => {
+    const session = socket.request.session;
+    if (!session.user) {
+        socket.emit('redirect', '/login');
+    } else {
+        const user = session.user;
+        console.log(`Usuario: ${user} conectado`);
+        const productos = await contenedorMongoProductos.getAll();
+        const mensajes = await contenedorMongoMensajes.getAll();
+        socket.emit('newSession', user);
+        socket.emit("getProductos", productos);
+        socket.emit("getMensajes", mensajes);
+
+        socket.on('addProducto', async prod => {
+            const session = socket.request.session;
+            if (new Date() > session.cookie._expires) {
+                socket.emit('redirect', '/login');
+            } else {
+                console.log("Agregando producto...");
+                await contenedorMongoProductos.addData(prod);
+                console.log("Producto Agregado.");
+                const productos = await contenedorMongoProductos.getAll();
+                io.sockets.emit('getProductos', productos);
+            }
+        });
+
+        socket.on('addMensaje', async msj => {
+            console.log("Agregando Mensaje...");
+            await contenedorMongoMensajes.addData(msj);
+            console.log("Mensaje Agregado");
+            const mensajes = await contenedorMongoMensajes.getAll();
+            io.sockets.emit('getMensajes', mensajes);
+            session.touch();
+        });
+    }
+});
 
 const PORT = process.env.PORT || 8080;
 const server = httpServer.listen(PORT, () => {
